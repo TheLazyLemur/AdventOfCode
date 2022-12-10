@@ -13,7 +13,13 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+	}(file)
 
 	var elvesCount, max int
 	elvesMap := make(map[int]int)
@@ -24,11 +30,15 @@ func main() {
 
 		if line == "" {
 			elvesCount++
-			elvesMap[elvesCount] = 0
 			continue
 		}
 
-		value, _ := strconv.Atoi(line)
+		value, err := strconv.Atoi(line)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+
 		elvesMap[elvesCount] += value
 
 		if elvesMap[elvesCount] > max {
@@ -43,4 +53,3 @@ func main() {
 
 	fmt.Println(max)
 }
-
